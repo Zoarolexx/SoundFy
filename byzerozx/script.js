@@ -77,7 +77,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 // ============================================================
-// NAVIGASI
+// NAVIGASI - FIX BOTTOM NAV
 // ============================================================
 window.addEventListener('load', () => {
     history.replaceState({ view: 'home' }, '', '#home');
@@ -86,6 +86,8 @@ window.addEventListener('load', () => {
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
+    // Set active nav
+    setActiveNav('home');
 });
 
 window.addEventListener('popstate', (e) => {
@@ -96,15 +98,7 @@ window.addEventListener('popstate', (e) => {
     }
 });
 
-function switchView(viewName, pushState = true) {
-    const views = ['home', 'search', 'library', 'developer', 'artist', 'playlist'];
-    views.forEach(id => {
-        const el = document.getElementById('view-' + id);
-        if (el) el.classList.remove('active');
-    });
-    const target = document.getElementById('view-' + viewName);
-    if (target) target.classList.add('active');
-    
+function setActiveNav(viewName) {
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     const navMap = { home: 0, search: 1, library: 2, developer: 3 };
     const idx = navMap[viewName];
@@ -112,16 +106,39 @@ function switchView(viewName, pushState = true) {
         const navItems = document.querySelectorAll('.nav-item');
         if (navItems[idx]) navItems[idx].classList.add('active');
     }
+}
+
+function switchView(viewName, pushState = true) {
+    // Hide all views
+    const views = ['home', 'search', 'library', 'developer', 'artist', 'playlist'];
+    views.forEach(id => {
+        const el = document.getElementById('view-' + id);
+        if (el) el.classList.remove('active');
+    });
     
+    // Show target view
+    const target = document.getElementById('view-' + viewName);
+    if (target) target.classList.add('active');
+    
+    // Update active nav
+    setActiveNav(viewName);
+    
+    // Load data if needed
     if (viewName === 'library') renderLibraryUI();
     if (viewName === 'developer') {
         const installBtn = document.getElementById('installAppBtn');
         if (installBtn && deferredPrompt) installBtn.style.display = 'flex';
     }
+    
+    // Scroll to top
     window.scrollTo(0, 0);
+    
+    // Update history
     if (pushState) {
         history.pushState({ view: viewName }, '', `#${viewName}`);
     }
+    
+    // Recreate icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
@@ -855,58 +872,65 @@ function renderSearchCategories() {
 // ============================================================
 let searchTimeout;
 
+// Gunakan event listener yang sudah ada di HTML dengan onclick
+function handleSearchInput() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    clearTimeout(searchTimeout);
+    const query = searchInput.value.trim();
+    const clearBtn = document.getElementById('searchClear');
+    
+    if (clearBtn) {
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+    }
+    
+    const categoriesUI = document.getElementById('searchCategoriesUI');
+    const resultsUI = document.getElementById('searchResultsUI');
+    
+    if (query.length === 0) {
+        if (categoriesUI) categoriesUI.style.display = 'block';
+        if (resultsUI) resultsUI.style.display = 'none';
+        return;
+    }
+    
+    if (categoriesUI) categoriesUI.style.display = 'none';
+    if (resultsUI) resultsUI.style.display = 'block';
+    
+    searchTimeout = setTimeout(async () => {
+        const results = document.getElementById('searchResults');
+        if (results) results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">🔍 Mencari musik...</div>';
+        
+        try {
+            const response = await fetch(`${API.search}?query=${encodeURIComponent(query)}`);
+            const result = await response.json();
+            
+            if (results) {
+                if (result.status === true && result.result && result.result.songs && result.result.songs.length > 0) {
+                    let html = '';
+                    result.result.songs.forEach(t => html += createListHTML(t));
+                    results.innerHTML = html;
+                } else {
+                    results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">😕 Tidak ada hasil</div>';
+                }
+            }
+        } catch (error) {
+            if (results) {
+                results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">⚠️ Anda Sedang Offline</div>';
+            }
+        }
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }, 800);
+}
+
+// Event listener untuk search input
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
-            const clearBtn = document.getElementById('searchClear');
-            
-            if (clearBtn) {
-                clearBtn.style.display = query.length > 0 ? 'block' : 'none';
-            }
-            
-            const categoriesUI = document.getElementById('searchCategoriesUI');
-            const resultsUI = document.getElementById('searchResultsUI');
-            
-            if (query.length === 0) {
-                if (categoriesUI) categoriesUI.style.display = 'block';
-                if (resultsUI) resultsUI.style.display = 'none';
-                return;
-            }
-            
-            if (categoriesUI) categoriesUI.style.display = 'none';
-            if (resultsUI) resultsUI.style.display = 'block';
-            
-            searchTimeout = setTimeout(async () => {
-                const results = document.getElementById('searchResults');
-                if (results) results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">🔍 Mencari musik...</div>';
-                
-                try {
-                    const response = await fetch(`${API.search}?query=${encodeURIComponent(query)}`);
-                    const result = await response.json();
-                    
-                    if (results) {
-                        if (result.status === true && result.result && result.result.songs && result.result.songs.length > 0) {
-                            let html = '';
-                            result.result.songs.forEach(t => html += createListHTML(t));
-                            results.innerHTML = html;
-                        } else {
-                            results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">😕 Tidak ada hasil</div>';
-                        }
-                    }
-                } catch (error) {
-                    if (results) {
-                        results.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">⚠️ Anda Sedang Offline</div>';
-                    }
-                }
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }, 800);
-        });
+        searchInput.addEventListener('input', handleSearchInput);
     }
 });
 
@@ -928,7 +952,7 @@ function searchMusic(query) {
     const input = document.getElementById('searchInput');
     if (input) {
         input.value = query;
-        input.dispatchEvent(new Event('input'));
+        handleSearchInput();
         switchView('search');
     }
 }

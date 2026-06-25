@@ -60,7 +60,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                    showToast('✅ Aplikasi berhasil diinstall!');
+                }
                 deferredPrompt = null;
             }
         });
@@ -70,6 +73,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
     document.getElementById('installAppBtn').style.display = 'none';
     deferredPrompt = null;
+    showToast('✅ Aplikasi berhasil diinstall!');
 });
 
 // ============================================================
@@ -77,13 +81,6 @@ window.addEventListener('appinstalled', () => {
 // ============================================================
 window.addEventListener('load', () => {
     history.replaceState({ view: 'home' }, '', '#home');
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-            reg.update();
-        }).catch(err => console.log('PWA error:', err));
-    }
-    
     loadHomeData();
     renderSearchCategories();
 });
@@ -100,7 +97,7 @@ window.addEventListener('popstate', (e) => {
 // INDEXEDDB SETUP
 // ============================================================
 let db;
-const request = indexedDB.open("SoundifyDB", 2);
+const request = indexedDB.open("SoundFyDB", 2);
 request.onupgradeneeded = function(e) {
     db = e.target.result;
     if(!db.objectStoreNames.contains('playlists')) db.createObjectStore('playlists', { keyPath: 'id' });
@@ -127,6 +124,9 @@ let isEditMode = false;
 let selectedTracksForDelete = new Set();
 let currentPlaylistTracks = [];
 let activePlaylistId = null;
+let currentLyrics = [];
+let isLyricsVisible = false;
+let currentLyricIndex = -1;
 
 // ============================================================
 // YOUTUBE PLAYER
@@ -264,6 +264,14 @@ function playMusic(videoId, encodedTrackData, contextData = null) {
     document.getElementById('miniProgressBar').style.width = '0%';
     document.getElementById('currentTime').innerText = "0:00";
     document.getElementById('totalTime').innerText = "0:00";
+    
+    // Reset lyrics
+    currentLyrics = [];
+    currentLyricIndex = -1;
+    document.getElementById('lyricsContainer').innerHTML = '<div style="color:#a7a7a7;text-align:center;font-size:13px;padding:10px;">Klik tombol untuk menampilkan lirik</div>';
+    if (isLyricsVisible) {
+        fetchLyrics(currentTrack.videoId);
+    }
 }
 
 function togglePlay() {
@@ -295,6 +303,9 @@ function startProgressBar() {
                 document.getElementById('miniProgressBar').style.width = `${percent}%`;
                 document.getElementById('currentTime').innerText = formatTime(current);
                 document.getElementById('totalTime').innerText = formatTime(duration);
+                if (isLyricsVisible) {
+                    updateLyrics(current);
+                }
             }
         }
     }, 1000);
@@ -398,7 +409,7 @@ function shareLagu() {
     if(navigator.share && currentTrack) {
         navigator.share({
             title: currentTrack.title,
-            text: `Dengarkan ${currentTrack.title} oleh ${currentTrack.artist} di Soundify!`,
+            text: `Dengarkan ${currentTrack.title} oleh ${currentTrack.artist} di SoundFy!`,
             url: window.location.href
         }).catch(err => console.log('Share gagal', err));
     } else {
@@ -952,4 +963,93 @@ function playFirstArtistTrack() {
     const container = document.getElementById('artistTracksContainer');
     const first = container.querySelector('.v-item');
     if(first) first.click();
+}
+
+// ============================================================
+// LYRICS FUNCTIONS
+// ============================================================
+async function fetchLyrics(videoId) {
+    if (!videoId) return;
+    try {
+        const response = await fetch(`${API.lyrics}?id=${videoId}`);
+        const result = await response.json();
+        if (result.status === true && result.result && result.result.lyrics && result.result.lyrics.lines.length > 0) {
+            currentLyrics = result.result.lyrics.lines;
+            renderLyrics(currentLyrics);
+        } else {
+            currentLyrics = [];
+            document.getElementById('lyricsContainer').innerHTML = '<div style="color:#a7a7a7;text-align:center;font-size:13px;padding:10px;">Lirik tidak tersedia</div>';
+        }
+    } catch (error) {
+        console.error('Lyrics fetch error:', error);
+        document.getElementById('lyricsContainer').innerHTML = '<div style="color:#a7a7a7;text-align:center;font-size:13px;padding:10px;">Gagal memuat lirik</div>';
+    }
+}
+
+function renderLyrics(lines) {
+    const container = document.getElementById('lyricsContainer');
+    if (!container) return;
+    if (!lines || lines.length === 0) {
+        container.innerHTML = '<div style="color:#a7a7a7;text-align:center;font-size:13px;padding:10px;">Lirik tidak tersedia</div>';
+        return;
+    }
+    let html = '';
+    lines.forEach((line, index) => {
+        const text = line.text || '';
+        if (text.trim()) {
+            html += `<div class="lyric-line" data-index="${index}" data-time="${line.time || 0}">${text}</div>`;
+        }
+    });
+    container.innerHTML = html;
+}
+
+function updateLyrics(currentTime) {
+    if (!currentLyrics || currentLyrics.length === 0) return;
+    const lines = document.querySelectorAll('.lyric-line');
+    let activeIndex = -1;
+    for (let i = 0; i < currentLyrics.length; i++) {
+        const time = currentLyrics[i].time || 0;
+        if (currentTime >= time) {
+            activeIndex = i;
+        } else {
+            break;
+        }
+    }
+    if (activeIndex !== currentLyricIndex) {
+        currentLyricIndex = activeIndex;
+        lines.forEach((line, index) => {
+            line.classList.remove('active', 'inactive');
+            if (index === activeIndex) {
+                line.classList.add('active');
+                line.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            } else if (index < activeIndex) {
+                line.classList.add('inactive');
+            }
+        });
+    }
+}
+
+function toggleLyrics() {
+    isLyricsVisible = !isLyricsVisible;
+    const container = document.getElementById('lyricsContainer');
+    const btn = document.getElementById('lyricsToggleBtn');
+    const btnText = document.getElementById('lyricsBtnText');
+    
+    if (isLyricsVisible) {
+        container.style.display = 'block';
+        btn.classList.add('active');
+        btnText.textContent = 'Sembunyikan';
+        if (currentLyrics.length === 0 && currentTrack) {
+            fetchLyrics(currentTrack.videoId);
+        }
+        const progress = document.getElementById('progressBar');
+        if (progress && ytPlayer && ytPlayer.getCurrentTime) {
+            const currentTime = ytPlayer.getCurrentTime() || 0;
+            updateLyrics(currentTime);
+        }
+    } else {
+        container.style.display = 'none';
+        btn.classList.remove('active');
+        btnText.textContent = 'Tampilkan Lirik';
+    }
 }

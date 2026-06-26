@@ -14,7 +14,7 @@
 </head>
 <body>
 
-    <!-- ========== SPLASH SCREEN ========== -->
+    <!-- SPLASH SCREEN -->
     <div id="splash-screen">
         <div class="splash-bg"></div>
         <div class="splash-particles" id="splashParticles">
@@ -51,9 +51,10 @@
         <div class="footer-splash">Powered by SoundFy Team • v2.0.0</div>
     </div>
 
-    <!-- ========== MAIN CONTENT ========== -->
+    <!-- MAIN CONTENT -->
     <div class="app-container">
-        <!-- Header -->
+
+        <!-- HEADER -->
         <header class="app-header">
             <div class="header-left">
                 <img src="images/logo.jpg" class="header-logo" alt="SoundFy" onerror="this.style.display='none'">
@@ -64,7 +65,7 @@
             </button>
         </header>
 
-        <!-- Quick Filters -->
+        <!-- QUICK FILTERS -->
         <div class="quick-filters" id="quickFilters">
             <button class="filter-chip active" onclick="setQuickFilter('all')">Semua</button>
             <button class="filter-chip" onclick="setQuickFilter('chill')">Chill</button>
@@ -75,13 +76,15 @@
 
         <!-- ========== VIEW HOME ========== -->
         <div id="view-home" class="view-section active">
-            <!-- Hero / Now Playing -->
+
+            <!-- HERO / NOW PLAYING -->
             <div class="hero-card" onclick="expandPlayer()">
                 <div class="hero-content">
                     <div class="hero-info">
-                        <span class="hero-badge">Now Playing</span>
+                        <span class="hero-badge">▶ Now Playing</span>
                         <h2 class="hero-title" id="heroTitle">How I Met My Ex</h2>
                         <p class="hero-artist" id="heroArtist">Dave</p>
+                        <p class="hero-sub" id="heroSub">Sounds like Raindance • Dave, Tems</p>
                     </div>
                     <div class="hero-cover" id="heroCover">
                         <img src="images/logo.jpg" alt="Cover">
@@ -92,9 +95,9 @@
                 </div>
             </div>
 
-            <!-- Speed Dial -->
+            <!-- SPEED DIAL -->
             <div class="section-header">
-                <h3 class="section-title">Speed dial</h3>
+                <h3 class="section-title">⚡ Speed dial</h3>
             </div>
             <div class="speed-dial" id="speedDial">
                 <div class="speed-item" onclick="searchMusic('Espresso')">
@@ -103,11 +106,11 @@
                     </div>
                     <span class="speed-name">Espresso</span>
                 </div>
-                <div class="speed-item" onclick="searchMusic('I Never Lie')">
+                <div class="speed-item" onclick="searchMusic('Faithfully 2024')">
                     <div class="speed-icon" style="background:linear-gradient(135deg,#477d95,#1e3264);">
                         <i data-lucide="music" class="w-6 h-6"></i>
                     </div>
-                    <span class="speed-name">I Never Lie</span>
+                    <span class="speed-name">Faithfully</span>
                 </div>
                 <div class="speed-item" onclick="searchMusic('TEXAS HOLD EM')">
                     <div class="speed-icon" style="background:linear-gradient(135deg,#e8115b,#8d67ab);">
@@ -115,25 +118,39 @@
                     </div>
                     <span class="speed-name">TEXAS HOLD 'EM</span>
                 </div>
+                <div class="speed-item" onclick="searchMusic('Christmas Eve Shirt')">
+                    <div class="speed-icon" style="background:linear-gradient(135deg,#f5a623,#e1118c);">
+                        <i data-lucide="music" class="w-6 h-6"></i>
+                    </div>
+                    <span class="speed-name">Christmas Eve</span>
+                </div>
+                <div class="speed-item" onclick="searchMusic('Still')">
+                    <div class="speed-icon" style="background:linear-gradient(135deg,#8d67ab,#477d95);">
+                        <i data-lucide="music" class="w-6 h-6"></i>
+                    </div>
+                    <span class="speed-name">Still</span>
+                </div>
+                <div class="speed-item" onclick="searchMusic('Top Countdown')">
+                    <div class="speed-icon" style="background:linear-gradient(135deg,#1db954,#e8115b);">
+                        <i data-lucide="music" class="w-6 h-6"></i>
+                    </div>
+                    <span class="speed-name">Top Countdown</span>
+                </div>
             </div>
 
-            <!-- Recommended -->
+            <!-- PILIHAN CEPAT -->
             <div class="section-header">
-                <h3 class="section-title">Rekomendasi</h3>
+                <h3 class="section-title">🎯 Pilihan cepat</h3>
+                <span class="section-more" onclick="showToast('Semua lagu')">Putar semua</span>
             </div>
-            <div class="horizontal-scroll" id="rowAnyar"></div>
+            <div class="quick-playlist" id="rowAnyar"></div>
 
-            <!-- Trending -->
+            <!-- FROM THE COMMUNITY -->
             <div class="section-header">
-                <h3 class="section-title">Trending</h3>
+                <h3 class="section-title">🌐 From the community</h3>
             </div>
-            <div class="horizontal-scroll" id="rowCharts"></div>
+            <div class="community-playlist" id="rowCharts"></div>
 
-            <!-- Playlists -->
-            <div class="section-header">
-                <h3 class="section-title">Playlist</h3>
-            </div>
-            <div class="horizontal-scroll" id="rowPlaylists"></div>
         </div>
 
         <!-- ========== VIEW SEARCH ========== -->
@@ -164,7 +181,7 @@
         <!-- ========== VIEW LIBRARY ========== -->
         <div id="view-library" class="view-section">
             <div class="library-header">
-                <h2 class="library-title">Pustaka</h2>
+                <h2 class="library-title">📚 Pustaka</h2>
             </div>
             <div class="library-tabs">
                 <button class="lib-tab active" onclick="setLibTab('playlists')">Daftar putar</button>
@@ -247,7 +264,7 @@
                 </div>
                 <div class="dev-divider"></div>
                 <div class="dev-card">
-                    <p class="dev-support">Like what I do?</p>
+                    <p class="dev-support">☕ Like what I do?</p>
                     <button class="dev-donate">
                         <i data-lucide="coffee" class="w-5 h-5"></i>
                         Buy me a coffee
@@ -274,8 +291,102 @@
             </div>
         </div>
 
+        <!-- ========== VIEW ARTIST ========== -->
+        <div id="view-artist" class="view-section">
+            <div class="artist-header">
+                <button class="back-btn" onclick="switchView('home')">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </button>
+                <h1 id="artistNameDisplay" class="artist-name">tenxi</h1>
+            </div>
+            <div class="artist-menu">
+                <button class="artist-tab active" onclick="setArtistTab('all')">Semua</button>
+                <button class="artist-tab" onclick="setArtistTab('songs')">Lagu</button>
+                <button class="artist-tab" onclick="setArtistTab('videos')">Video</button>
+                <button class="artist-tab" onclick="setArtistTab('albums')">Album</button>
+            </div>
+            <div class="section-container">
+                <div class="vertical-list" id="artistTracksContainer"></div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW PLAYLIST ========== -->
+        <div id="view-playlist" class="view-section">
+            <div class="playlist-header">
+                <button class="back-btn" onclick="switchView('library')">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </button>
+                <div class="playlist-cover-box" id="playlistImageContainer">
+                    <img id="playlistImageDisplay" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
+                    <svg id="playlistSvgDisplay" viewBox="0 0 24 24" style="width:80px;height:80px;fill:white;display:none;">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                    </svg>
+                </div>
+                <h1 id="playlistNameDisplay" class="playlist-name">Daftar putar</h1>
+                <div id="playlistStatsDisplay" class="playlist-stats">0 lagu</div>
+                <div class="playlist-actions">
+                    <div class="action-group">
+                        <i data-lucide="download" class="w-5 h-5" onclick="downloadCurrentPlaylist()"></i>
+                        <i data-lucide="edit" class="w-5 h-5" onclick="toggleEditMode()"></i>
+                        <i data-lucide="shuffle" class="w-5 h-5" id="btnPlaylistShuffle" onclick="toggleShuffle()"></i>
+                    </div>
+                    <div class="play-pause-btn" onclick="playFirstPlaylistTrack()">
+                        <i data-lucide="play" class="w-6 h-6 fill-current ml-0.5"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="section-container">
+                <div class="vertical-list" id="playlistTracksContainer"></div>
+                <div class="bulk-action-bar" id="bulkActionBar">
+                    <span id="selCountText">0 lagu dipilih</span>
+                    <button onclick="deleteSelectedTracks()">Hapus</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== NOW PLAYING VIEW ========== -->
+        <div id="view-nowplaying" class="view-section">
+            <div class="np-header">
+                <button class="back-btn" onclick="switchView('home')">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </button>
+                <h2>Now Playing</h2>
+                <button class="np-menu" onclick="openPlayerMenuModal()">
+                    <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="np-art">
+                <img id="npArt" src="images/logo.jpg" alt="Cover">
+            </div>
+            <div class="np-info">
+                <h3 id="npTitle">mejikuhibiniu</h3>
+                <p id="npArtist">Tenxi</p>
+            </div>
+            <div class="np-progress">
+                <span id="npCurrent">0:03</span>
+                <input type="range" id="npProgress" min="0" max="100" value="0" oninput="seekTo(this.value)">
+                <span id="npTotal">3:17</span>
+            </div>
+            <div class="np-controls">
+                <button onclick="toggleShuffle()"><i data-lucide="shuffle" class="w-5 h-5"></i></button>
+                <button onclick="playPrevTrack()"><i data-lucide="skip-back" class="w-7 h-7 fill-current"></i></button>
+                <button onclick="togglePlay()" class="np-play-btn">
+                    <svg id="npPlayBtn" viewBox="0 0 24 24" class="w-8 h-8 fill-current ml-0.5">
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                </button>
+                <button onclick="playNextTrack(true)"><i data-lucide="skip-forward" class="w-7 h-7 fill-current"></i></button>
+                <button onclick="toggleRepeat()"><i data-lucide="repeat" class="w-5 h-5"></i></button>
+            </div>
+            <div class="np-actions">
+                <button onclick="openAddToPlaylistModal()"><i data-lucide="list-plus" class="w-6 h-6"></i> <span>Tambahkan</span></button>
+                <button onclick="toggleLyrics()"><i data-lucide="mic-2" class="w-6 h-6"></i> <span>Lirik</span></button>
+                <button onclick="openArtistView(currentTrack ? currentTrack.artist : '')"><i data-lucide="user" class="w-6 h-6"></i> <span>Lihat Artis</span></button>
+            </div>
+        </div>
+
         <!-- ========== MINI PLAYER ========== -->
-        <div id="miniPlayer" class="mini-player" onclick="expandPlayer()" style="display:none;">
+        <div id="miniPlayer" class="mini-player" onclick="openNowPlaying()" style="display:none;">
             <div class="mini-player-content">
                 <img id="miniPlayerImg" src="images/logo.jpg" alt="Cover" class="mini-cover">
                 <div class="mini-info">
@@ -287,7 +398,9 @@
                         <i data-lucide="list-plus" class="w-5 h-5"></i>
                     </button>
                     <button onclick="event.stopPropagation();togglePlay()" class="mini-play-btn">
-                        <svg id="miniPlayBtn" viewBox="0 0 24 24" class="w-6 h-6 fill-current"><path d="M8 5v14l11-7z"></path></svg>
+                        <svg id="miniPlayBtn" viewBox="0 0 24 24" class="w-6 h-6 fill-current">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -298,22 +411,22 @@
 
         <!-- ========== BOTTOM NAV ========== -->
         <nav class="bottom-nav">
-            <div class="nav-item active" onclick="switchView('home')">
+            <button class="nav-item active" onclick="switchView('home')">
                 <i data-lucide="home" class="w-6 h-6"></i>
                 <span>Beranda</span>
-            </div>
-            <div class="nav-item" onclick="switchView('search')">
+            </button>
+            <button class="nav-item" onclick="switchView('search')">
                 <i data-lucide="search" class="w-6 h-6"></i>
                 <span>Mencari</span>
-            </div>
-            <div class="nav-item" onclick="switchView('library')">
+            </button>
+            <button class="nav-item" onclick="switchView('library')">
                 <i data-lucide="library" class="w-6 h-6"></i>
                 <span>Pustaka</span>
-            </div>
-            <div class="nav-item" onclick="switchView('developer')">
+            </button>
+            <button class="nav-item" onclick="switchView('developer')">
                 <i data-lucide="info" class="w-6 h-6"></i>
                 <span>Developer</span>
-            </div>
+            </button>
         </nav>
 
         <!-- ========== FULL PLAYER MODAL ========== -->
@@ -359,7 +472,7 @@
                     </div>
                 </div>
 
-                <!-- LYRICS SECTION -->
+                <!-- LYRICS -->
                 <div class="lyrics-header">
                     <div class="lyrics-header-left">
                         <i data-lucide="mic-2" class="w-5 h-5"></i>
@@ -382,7 +495,9 @@
                         <i data-lucide="skip-back" class="w-7 h-7 fill-current"></i>
                     </button>
                     <button onclick="togglePlay()" class="play-pause-main">
-                        <svg id="mainPlayBtn" viewBox="0 0 24 24" class="w-8 h-8 fill-current ml-0.5"><path d="M8 5v14l11-7z"></path></svg>
+                        <svg id="mainPlayBtn" viewBox="0 0 24 24" class="w-8 h-8 fill-current ml-0.5">
+                            <path d="M8 5v14l11-7z"></path>
+                        </svg>
                     </button>
                     <button onclick="playNextTrack(true)" class="ctrl-btn">
                         <i data-lucide="skip-forward" class="w-7 h-7 fill-current"></i>
@@ -396,7 +511,7 @@
             </div>
         </div>
 
-        <!-- ========== PLAYER MENU MODAL ========== -->
+        <!-- ========== PLAYER MENU ========== -->
         <div id="playerMenuModal" class="modal-overlay" style="display:none;justify-content:flex-end;background:rgba(0,0,0,0.8);z-index:2500;">
             <div class="player-menu">
                 <div class="menu-header">
@@ -407,26 +522,22 @@
                     </div>
                 </div>
                 <div class="menu-item" onclick="downloadCurrentTrack()">
-                    <i data-lucide="download" class="w-5 h-5"></i>
-                    Download Lagu (Offline)
+                    <i data-lucide="download" class="w-5 h-5"></i> Download Lagu (Offline)
                 </div>
                 <div class="menu-item" onclick="setSleepTimer()">
-                    <i data-lucide="clock" class="w-5 h-5"></i>
-                    Waktu Tidur (Sleep Timer)
+                    <i data-lucide="clock" class="w-5 h-5"></i> Waktu Tidur (Sleep Timer)
                 </div>
                 <div class="menu-item" onclick="toggleFavoritLagu()">
-                    <i data-lucide="star" class="w-5 h-5"></i>
-                    Tambahkan ke Favorit
+                    <i data-lucide="star" class="w-5 h-5"></i> Tambahkan ke Favorit
                 </div>
                 <div class="menu-item" onclick="shareLagu()">
-                    <i data-lucide="share-2" class="w-5 h-5"></i>
-                    Bagikan
+                    <i data-lucide="share-2" class="w-5 h-5"></i> Bagikan
                 </div>
                 <div class="menu-item" onclick="closePlayerMenuModal()" style="color:#6b7280;margin-top:10px;">Batal</div>
             </div>
         </div>
 
-        <!-- ========== CREATE PLAYLIST MODAL ========== -->
+        <!-- ========== CREATE PLAYLIST ========== -->
         <div id="createPlaylistModal" style="display:none;">
             <div class="modal-overlay" style="display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.9);">
                 <div class="cp-box">
@@ -444,7 +555,7 @@
             </div>
         </div>
 
-        <!-- ========== ADD TO PLAYLIST MODAL ========== -->
+        <!-- ========== ADD TO PLAYLIST ========== -->
         <div id="addToPlaylistModal" class="modal-overlay" style="display:none;justify-content:flex-end;background:rgba(0,0,0,0.8);">
             <div class="add-to-playlist">
                 <div class="add-header">
@@ -462,6 +573,7 @@
 
         <!-- ========== YOUTUBE PLAYER ========== -->
         <div id="youtube-player" style="display:none;"></div>
+
     </div>
 
     <script src="byzerozx/script.js"></script>

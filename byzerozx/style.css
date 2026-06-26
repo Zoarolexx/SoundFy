@@ -268,7 +268,6 @@ body { background:var(--bg-base); color:var(--text-main); overflow-x:hidden; pad
 .toast-notification.show { bottom:90px; }
 
 /* ========== SPLASH SCREEN ========== */
-/* (splash styles dari sebelumnya) */
 .splash-bg { position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(29,185,84,0.1) 0%, #0a0a0f 70%); z-index:0; }
 .splash-particles { position:absolute; inset:0; z-index:0; overflow:hidden; }
 .splash-particles span { position:absolute; width:3px; height:3px; background:#1db954; border-radius:50%; animation:floatParticle linear infinite; opacity:0; }
@@ -306,12 +305,36 @@ body { background:var(--bg-base); color:var(--text-main); overflow-x:hidden; pad
 @keyframes dotBounce { 0%,80%,100% { transform:scale(0.6); opacity:0.2; } 40% { transform:scale(1.2); opacity:1; background:#1db954; } }
 .footer-splash { position:absolute; bottom:24px; left:0; right:0; font-size:10px; color:rgba(255,255,255,0.15); text-align:center; z-index:2; }
 
+/* ========== VIEW SECTIONS ========== */
+.view-section { display:none; }
+.view-section.active { display:block; }
+
+/* ========== ARTIST VIEW ========== */
+.artist-header { padding:40px 16px 20px; background:linear-gradient(to bottom,#1db954,#0a0a0f); display:flex; flex-direction:column; gap:16px; }
+.artist-header .back-btn { background:rgba(0,0,0,0.5); border:none; color:white; width:32px; height:32px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; }
+.artist-name { font-size:40px; font-weight:800; }
+.artist-play-btn { margin-top:-20px; margin-left:16px; }
+
+/* ========== PLAYLIST VIEW ========== */
+.playlist-header { padding:20px 16px; background:linear-gradient(to bottom,#1db954,#0a0a0f); }
+.playlist-cover-box { width:240px; height:240px; border-radius:12px; display:flex; justify-content:center; align-items:center; box-shadow:var(--shadow); overflow:hidden; background:var(--bg-card); border:1px solid var(--border-color); margin:0 auto; }
+.playlist-name { font-size:26px; font-weight:700; text-align:left; margin-top:16px; }
+.playlist-stats { font-size:13px; color:var(--text-sub); }
+.playlist-actions { display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+.playlist-actions .action-group { display:flex; gap:20px; align-items:center; }
+.playlist-actions .action-group svg { width:24px; height:24px; fill:var(--text-sub); cursor:pointer; }
+
+/* ========== BULK ACTION BAR ========== */
+.bulk-action-bar { display:none; position:sticky; bottom:80px; left:16px; right:16px; background:#e8115b; color:white; padding:14px; border-radius:8px; justify-content:space-between; align-items:center; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
+.bulk-action-bar button { background:white; color:#e8115b; border:none; padding:6px 12px; border-radius:20px; font-weight:bold; cursor:pointer; }
+
 /* ========== RESPONSIVE ========== */
 @media (max-width:400px) {
     .h-card { width:120px; }
     .h-img { width:120px; height:120px; }
     .hero-title { font-size:16px; }
     .speed-icon { width:48px; height:48px; }
+    .playlist-cover-box { width:180px; height:180px; }
 }
 @media (min-width:600px) {
     .app-container { padding:0 20px; }

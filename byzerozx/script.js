@@ -90,42 +90,50 @@ window.addEventListener('popstate', (e) => {
     }
 });
 
-function switchView(viewName, pushState = true) {
-    // Hide all views
-    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+function switchView(viewName, pushState) {
+    if (pushState === undefined) pushState = true;
     
-    // Show target
-    const target = document.getElementById('view-' + viewName);
+    document.querySelectorAll('.view-section').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    
+    var target = document.getElementById('view-' + viewName);
     if (target) target.classList.add('active');
     
-    // Update nav
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navMap = { home: 0, search: 1, library: 2, developer: 3 };
-    const idx = navMap[viewName];
+    document.querySelectorAll('.nav-item').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    
+    var navMap = { home: 0, search: 1, library: 2, developer: 3 };
+    var idx = navMap[viewName];
     if (idx !== undefined) {
-        const navItems = document.querySelectorAll('.nav-item');
+        var navItems = document.querySelectorAll('.nav-item');
         if (navItems[idx]) navItems[idx].classList.add('active');
     }
     
-    // Load data
     if (viewName === 'library') renderLibraryUI();
     if (viewName === 'developer') {
-        const installBtn = document.getElementById('installAppBtn');
+        var installBtn = document.getElementById('installAppBtn');
         if (installBtn && deferredPrompt) installBtn.style.display = 'flex';
     }
     
     window.scrollTo(0, 0);
     if (pushState) {
-        history.pushState({ view: viewName }, '', `#${viewName}`);
+        history.pushState({ view: viewName }, '', '#' + viewName);
     }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function openNowPlaying() {
+    switchView('nowplaying');
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // ============================================================
 // INDEXEDDB
 // ============================================================
-let db;
-const request = indexedDB.open("SoundFyDB", 2);
+var db;
+var request = indexedDB.open("SoundFyDB", 2);
 request.onupgradeneeded = function(e) {
     db = e.target.result;
     if (!db.objectStoreNames.contains('playlists')) db.createObjectStore('playlists', { keyPath: 'id' });
@@ -142,22 +150,22 @@ request.onsuccess = function(e) {
 // ============================================================
 // GLOBAL VARIABLES
 // ============================================================
-let ytPlayer = null;
-let isPlaying = false;
-let currentTrack = null;
-let progressInterval = null;
-let isShuffle = false;
-let repeatState = 0;
-let currentRepeatCount = 0;
-let currentPlayContext = null;
-let sleepTimerTimeout = null;
-let isEditMode = false;
-let selectedTracksForDelete = new Set();
-let currentPlaylistTracks = [];
-let activePlaylistId = null;
-let currentLyrics = [];
-let isLyricsVisible = false;
-let currentLyricIndex = -1;
+var ytPlayer = null;
+var isPlaying = false;
+var currentTrack = null;
+var progressInterval = null;
+var isShuffle = false;
+var repeatState = 0;
+var currentRepeatCount = 0;
+var currentPlayContext = null;
+var sleepTimerTimeout = null;
+var isEditMode = false;
+var selectedTracksForDelete = new Set();
+var currentPlaylistTracks = [];
+var activePlaylistId = null;
+var currentLyrics = [];
+var isLyricsVisible = false;
+var currentLyricIndex = -1;
 
 // ============================================================
 // UTILITY
@@ -172,19 +180,19 @@ function getHighResImage(url) {
 
 function formatTime(seconds) {
     if (!seconds || isNaN(seconds)) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
+    var m = Math.floor(seconds / 60);
+    var s = Math.floor(seconds % 60);
     return m + ':' + (s < 10 ? '0' : '') + s;
 }
 
-let toastTimeout = null;
+var toastTimeout = null;
 function showToast(message) {
-    const toast = document.getElementById('customToast');
+    var toast = document.getElementById('customToast');
     if (!toast) return;
     toast.textContent = message;
     toast.classList.add('show');
     clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
+    toastTimeout = setTimeout(function() {
         toast.classList.remove('show');
     }, 3000);
 }
@@ -215,27 +223,31 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerStateChange(event) {
-    const mainBtn = document.getElementById('mainPlayBtn');
-    const miniBtn = document.getElementById('miniPlayBtn');
-    const play = "M8 5v14l11-7z";
-    const pause = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
+    var mainBtn = document.getElementById('mainPlayBtn');
+    var miniBtn = document.getElementById('miniPlayBtn');
+    var npBtn = document.getElementById('npPlayBtn');
+    var play = "M8 5v14l11-7z";
+    var pause = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
 
     if (event.data == YT.PlayerState.PLAYING) {
         isPlaying = true;
         if (mainBtn) mainBtn.innerHTML = '<path d="' + pause + '"></path>';
         if (miniBtn) miniBtn.innerHTML = '<path d="' + pause + '"></path>';
+        if (npBtn) npBtn.innerHTML = '<path d="' + pause + '"></path>';
         startProgressBar();
         if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     } else if (event.data == YT.PlayerState.PAUSED) {
         isPlaying = false;
         if (mainBtn) mainBtn.innerHTML = '<path d="' + play + '"></path>';
         if (miniBtn) miniBtn.innerHTML = '<path d="' + play + '"></path>';
+        if (npBtn) npBtn.innerHTML = '<path d="' + play + '"></path>';
         stopProgressBar();
         if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else if (event.data == YT.PlayerState.ENDED) {
         isPlaying = false;
         if (mainBtn) mainBtn.innerHTML = '<path d="' + play + '"></path>';
         if (miniBtn) miniBtn.innerHTML = '<path d="' + play + '"></path>';
+        if (npBtn) npBtn.innerHTML = '<path d="' + play + '"></path>';
         stopProgressBar();
         if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
         handleTrackEnded();
@@ -282,6 +294,9 @@ function startProgressBar() {
                         pb.style.background = 'linear-gradient(to right, #1db954 ' + percent + '%, rgba(255,255,255,0.08) ' + percent + '%)';
                     }
                     
+                    var np = document.getElementById('npProgress');
+                    if (np) np.value = percent;
+                    
                     var mp = document.getElementById('miniProgressBar');
                     if (mp) mp.style.width = percent + '%';
                     
@@ -291,8 +306,14 @@ function startProgressBar() {
                     var ct = document.getElementById('currentTime');
                     if (ct) ct.textContent = formatTime(current);
                     
+                    var npc = document.getElementById('npCurrent');
+                    if (npc) npc.textContent = formatTime(current);
+                    
                     var tt = document.getElementById('totalTime');
                     if (tt) tt.textContent = formatTime(duration);
+                    
+                    var npt = document.getElementById('npTotal');
+                    if (npt) npt.textContent = formatTime(duration);
                     
                     if (isLyricsVisible) {
                         updateLyrics(current);
@@ -331,6 +352,9 @@ function seekTo(value) {
             if (pb) {
                 pb.style.background = 'linear-gradient(to right, #1db954 ' + percent + '%, rgba(255,255,255,0.08) ' + percent + '%)';
             }
+            
+            var np = document.getElementById('npProgress');
+            if (np) np.value = percent;
             
             var mp = document.getElementById('miniProgressBar');
             if (mp) mp.style.width = percent + '%';
@@ -373,6 +397,7 @@ function playMusic(videoId, encodedTrackData, contextData) {
         checkIfLiked(currentTrack.videoId);
         updatePlayerUI(currentTrack);
         updateHeroUI(currentTrack);
+        updateNowPlayingUI(currentTrack);
         updateMediaSession();
         
         if (ytPlayer && ytPlayer.loadVideoById) {
@@ -395,7 +420,7 @@ function playMusic(videoId, encodedTrackData, contextData) {
 }
 
 function updatePlayerUI(track) {
-    var imgElements = ['miniPlayerImg', 'playerArt', 'menuArt'];
+    var imgElements = ['miniPlayerImg', 'playerArt', 'menuArt', 'npArt'];
     imgElements.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.src = track.img;
@@ -408,9 +433,11 @@ function updatePlayerUI(track) {
         'miniPlayerTitle': track.title,
         'playerTitle': track.title,
         'menuTitle': track.title,
+        'npTitle': track.title,
         'miniPlayerArtist': track.artist,
         'playerArtist': track.artist,
-        'menuArtist': track.artist
+        'menuArtist': track.artist,
+        'npArtist': track.artist
     };
     
     for (var key in textElements) {
@@ -430,9 +457,23 @@ function updateHeroUI(track) {
     if (cover) cover.innerHTML = '<img src="' + track.img + '" alt="Cover">';
 }
 
+function updateNowPlayingUI(track) {
+    var title = document.getElementById('npTitle');
+    if (title) title.textContent = track.title;
+    
+    var artist = document.getElementById('npArtist');
+    if (artist) artist.textContent = track.artist;
+    
+    var art = document.getElementById('npArt');
+    if (art) art.src = track.img;
+}
+
 function resetProgressUI() {
     var pb = document.getElementById('progressBar');
     if (pb) pb.value = 0;
+    
+    var np = document.getElementById('npProgress');
+    if (np) np.value = 0;
     
     var mp = document.getElementById('miniProgressBar');
     if (mp) mp.style.width = '0%';
@@ -443,8 +484,14 @@ function resetProgressUI() {
     var ct = document.getElementById('currentTime');
     if (ct) ct.textContent = '0:00';
     
+    var npc = document.getElementById('npCurrent');
+    if (npc) npc.textContent = '0:00';
+    
     var tt = document.getElementById('totalTime');
     if (tt) tt.textContent = '0:00';
+    
+    var npt = document.getElementById('npTotal');
+    if (npt) npt.textContent = '0:00';
 }
 
 function resetLyrics() {
@@ -745,12 +792,13 @@ function createListHTML(track, context) {
     })).replace(/'/g, '%27');
     var ctxStr = context ? encodeURIComponent(JSON.stringify(context)).replace(/'/g, '%27') : 'null';
     
-    return '<div class="search-result-item" onclick="playMusic(\'' + track.videoId + '\', \'' + trackData + '\', ' + (ctxStr !== 'null' ? 'JSON.parse(decodeURIComponent(\'' + ctxStr + '\'))' : 'null') + ')">' +
+    return '<div class="v-item" onclick="playMusic(\'' + track.videoId + '\', \'' + trackData + '\', ' + (ctxStr !== 'null' ? 'JSON.parse(decodeURIComponent(\'' + ctxStr + '\'))' : 'null') + ')">' +
         '<img src="' + img + '" onerror="this.src=\'https://placehold.co/48x48/282828/FFFFFF?text=Music\'">' +
         '<div class="info">' +
             '<div class="title">' + (track.title || 'Untitled') + '</div>' +
             '<div class="artist">' + artist + '</div>' +
         '</div>' +
+        '<span class="dots">⋯</span>' +
     '</div>';
 }
 
@@ -774,6 +822,46 @@ function createCardHTML(track, isArtist) {
     '</div>';
 }
 
+function createQuickItemHTML(track, index) {
+    var img = track.thumbnail || track.img || 'https://placehold.co/44x44/282828/FFFFFF?text=Music';
+    img = getHighResImage(img);
+    var artist = track.artist || 'Unknown';
+    var trackData = encodeURIComponent(JSON.stringify({
+        videoId: track.videoId,
+        title: track.title,
+        artist: artist,
+        img: img
+    })).replace(/'/g, '%27');
+    
+    return '<div class="quick-item" onclick="playMusic(\'' + track.videoId + '\', \'' + trackData + '\', null)">' +
+        '<span class="rank">' + (index + 1) + '</span>' +
+        '<img src="' + img + '" onerror="this.src=\'https://placehold.co/44x44/282828/FFFFFF?text=Music\'">' +
+        '<div class="info">' +
+            '<div class="title">' + (track.title || 'Untitled') + '</div>' +
+            '<div class="artist">' + artist + '</div>' +
+        '</div>' +
+        '<div class="play-btn"><svg viewBox="0 0 24 24" fill="black" width="16" height="16"><path d="M8 5v14l11-7z"/></svg></div>' +
+    '</div>';
+}
+
+function createCommunityItemHTML(track) {
+    var img = track.thumbnail || track.img || 'https://placehold.co/160x160/282828/FFFFFF?text=Music';
+    img = getHighResImage(img);
+    var artist = track.artist || 'Unknown';
+    var trackData = encodeURIComponent(JSON.stringify({
+        videoId: track.videoId,
+        title: track.title,
+        artist: artist,
+        img: img
+    })).replace(/'/g, '%27');
+    
+    return '<div class="community-item" onclick="playMusic(\'' + track.videoId + '\', \'' + trackData + '\', null)">' +
+        '<img src="' + img + '" class="cover" onerror="this.src=\'https://placehold.co/160x160/282828/FFFFFF?text=Music\'">' +
+        '<div class="title">' + (track.title || 'Untitled') + '</div>' +
+        '<div class="sub">' + artist + ' • 45 lagu</div>' +
+    '</div>';
+}
+
 // ============================================================
 // DATA FETCHING
 // ============================================================
@@ -788,7 +876,7 @@ async function fetchAndRender(query, containerId, formatType, isArtist, isHome) 
         var result = await response.json();
         
         if (result.status === true && result.result && result.result.songs && result.result.songs.length > 0) {
-            var limit = containerId === 'recentList' ? 4 : (formatType === 'list' ? 4 : 8);
+            var limit = formatType === 'quick' ? 4 : (formatType === 'community' ? 4 : (formatType === 'list' ? 4 : 8));
             var tracks = [];
             
             for (var i = 0; i < result.result.songs.length; i++) {
@@ -810,7 +898,16 @@ async function fetchAndRender(query, containerId, formatType, isArtist, isHome) 
                 track.title = track.title || 'Untitled';
                 track.artist = track.artist || 'Unknown Artist';
                 track.thumbnail = track.thumbnail || 'https://placehold.co/140x140/282828/FFFFFF?text=Music';
-                html += formatType === 'list' ? createListHTML(track) : createCardHTML(track, isArtist);
+                
+                if (formatType === 'quick') {
+                    html += createQuickItemHTML(track, j);
+                } else if (formatType === 'community') {
+                    html += createCommunityItemHTML(track);
+                } else if (formatType === 'list') {
+                    html += createListHTML(track);
+                } else {
+                    html += createCardHTML(track, isArtist);
+                }
             }
             container.innerHTML = html;
         } else {
@@ -825,11 +922,10 @@ async function fetchAndRender(query, containerId, formatType, isArtist, isHome) 
 
 function loadHomeData() {
     homeDisplayedVideoIds.clear();
-    fetchAndRender('lagu indonesia hits terbaru', 'rowAnyar', 'card', false, true);
-    fetchAndRender('top 50 indonesia playlist update', 'rowCharts', 'card', false, true);
+    fetchAndRender('lagu indonesia hits terbaru', 'rowAnyar', 'quick', false, true);
+    fetchAndRender('top 50 indonesia playlist update', 'rowCharts', 'community', false, true);
     fetchAndRender('penyanyi pop indonesia paling hits', 'rowArtists', 'card', true, true);
     fetchAndRender('lagu viral terbaru 2026', 'rowTiktok', 'card', false, true);
-    fetchAndRender('lagu galau sedih indonesia', 'rowGalau', 'card', false, true);
 }
 
 function renderSearchCategories() {
@@ -943,6 +1039,11 @@ function searchMusic(query) {
 // ARTIST
 // ============================================================
 function openArtistView(artistName) {
+    if (!artistName) {
+        showToast('⚠️ Nama artis tidak ditemukan');
+        return;
+    }
+    
     var display = document.getElementById('artistNameDisplay');
     if (display) display.textContent = artistName;
     
@@ -968,21 +1069,6 @@ function openArtistView(artistName) {
                         html += createListHTML(track, ctx);
                     }
                     container.innerHTML = html;
-                    
-                    if (result.result.songs.length > 0) {
-                        var firstTrack = result.result.songs[0];
-                        var btn = document.querySelector('.artist-play-btn');
-                        if (btn) {
-                            var trackData = encodeURIComponent(JSON.stringify({
-                                videoId: firstTrack.videoId,
-                                title: firstTrack.title,
-                                artist: firstTrack.artist || 'Unknown',
-                                img: firstTrack.thumbnail || 'https://placehold.co/48x48/282828/FFFFFF?text=Music'
-                            })).replace(/'/g, '%27');
-                            var ctxStr = encodeURIComponent(JSON.stringify(ctx)).replace(/'/g, '%27');
-                            btn.setAttribute('onclick', 'playMusic(\'' + firstTrack.videoId + '\', \'' + trackData + '\', JSON.parse(decodeURIComponent(\'' + ctxStr + '\')))');
-                        }
-                    }
                 } else {
                     container.innerHTML = '<div style="color:var(--text-sub);text-align:center;padding:20px;">😕 Tidak ada lagu</div>';
                 }
@@ -999,9 +1085,20 @@ function openArtistView(artistName) {
 function playFirstArtistTrack() {
     var container = document.getElementById('artistTracksContainer');
     if (container) {
-        var first = container.querySelector('.search-result-item');
+        var first = container.querySelector('.v-item');
         if (first) first.click();
     }
+}
+
+function setArtistTab(tab) {
+    document.querySelectorAll('.artist-tab').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    var tabs = document.querySelectorAll('.artist-tab');
+    var map = { all: 0, songs: 1, videos: 2, albums: 3 };
+    var idx = map[tab];
+    if (idx !== undefined && tabs[idx]) tabs[idx].classList.add('active');
+    showToast('📂 ' + tab.charAt(0).toUpperCase() + tab.slice(1));
 }
 
 // ============================================================
@@ -1117,7 +1214,7 @@ function processPlaylistData(dataArr, typeId) {
         img = getHighResImage(img);
         var artist = t.artist || 'Unknown';
         
-        html += '<div class="search-result-item" onclick="playMusic(\'' + t.videoId + '\', \'' + encodeURIComponent(JSON.stringify({
+        html += '<div class="v-item" onclick="playMusic(\'' + t.videoId + '\', \'' + encodeURIComponent(JSON.stringify({
             videoId: t.videoId,
             title: t.title || 'Untitled',
             artist: artist,
@@ -1128,6 +1225,7 @@ function processPlaylistData(dataArr, typeId) {
                 '<div class="title">' + (t.title || 'Untitled') + '</div>' +
                 '<div class="artist">' + artist + '</div>' +
             '</div>' +
+            '<span class="dots">⋯</span>' +
         '</div>';
     }
     
@@ -1271,7 +1369,7 @@ function toggleEditMode() {
     isEditMode = !isEditMode;
     selectedTracksForDelete.clear();
     
-    var items = document.querySelectorAll('#playlistTracksContainer .search-result-item');
+    var items = document.querySelectorAll('#playlistTracksContainer .v-item');
     for (var i = 0; i < items.length; i++) {
         if (isEditMode) {
             items[i].style.borderLeft = '3px solid #e8115b';
@@ -1291,12 +1389,7 @@ function toggleEditMode() {
 }
 
 function handleCheckDelete(videoId, isChecked) {
-    if (isChecked) {
-        selectedTracksForDelete.add(videoId);
-    } else {
-        selectedTracksForDelete.delete(videoId);
-    }
-    updateDeleteCount();
+    // Placeholder - implementasi checkbox nanti
 }
 
 function updateDeleteCount() {
